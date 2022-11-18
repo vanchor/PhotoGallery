@@ -1,18 +1,26 @@
-﻿@page "/Login"
+﻿@page "/login"
 
-<PageTitle>Counter</PageTitle>
+@inherits LoginModel
 
-<h1>Counter</h1>
+<div class="row">
 
-<p role="status">Current count: @currentCount</p>
+    <div class="col-md-6 offset-md-3">
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+        <h1>Enter zone</h1>
 
-@code {
-    private int currentCount = 0;
+        <EditForm Model="@LoginData" OnValidSubmit="LoginAsync">
+            <DataAnnotationsValidator/>
+            <ValidationSummary/>
 
-    private void IncrementCount()
-    {
-        currentCount++;
-    }
-}
+            <label for="username">UserName</label>
+            <InputText id="username" @bind-Value="LoginData.Username" class="form-control" />
+            <label for="password">Password</label>
+            <InputText id="password" @bind-Value="LoginData.Password" class="form-control" />
+
+            <p class="my-4">
+                <button type="submit" class="btn btn-primary">Log in</button>
+            </p>
+        </EditForm>
+
+    </div>
+</div>
