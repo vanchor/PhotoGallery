@@ -1,8 +1,0 @@
-C:\Users\vovan\source\repos\PhotoGallery\PhotoGallery\obj\Debug\net6.0\PhotoGallery.csproj.AssemblyReference.cache
-C:\Users\vovan\source\repos\PhotoGallery\PhotoGallery\obj\Debug\net6.0\PhotoGallery.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\vovan\source\repos\PhotoGallery\PhotoGallery\obj\Debug\net6.0\PhotoGallery.AssemblyInfoInputs.cache
-C:\Users\vovan\source\repos\PhotoGallery\PhotoGallery\obj\Debug\net6.0\PhotoGallery.AssemblyInfo.cs
-C:\Users\vovan\source\repos\PhotoGallery\PhotoGallery\obj\Debug\net6.0\PhotoGallery.csproj.CoreCompileInputs.cache
-C:\Users\vovan\source\repos\PhotoGallery\PhotoGallery\obj\Debug\net6.0\PhotoGallery.MvcApplicationPartsAssemblyInfo.cache
-C:\Users\vovan\source\repos\PhotoGallery\PhotoGallery\obj\Debug\net6.0\PhotoGallery.RazorAssemblyInfo.cache
-C:\Users\vovan\source\repos\PhotoGallery\PhotoGallery\obj\Debug\net6.0\PhotoGallery.RazorAssemblyInfo.cs
