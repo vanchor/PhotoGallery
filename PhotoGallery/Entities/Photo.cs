@@ -13,6 +13,7 @@ namespace PhotoGallery.Entities
         public string Username { get; set; }
 
         public virtual User User { get; set; }
-        public virtual ICollection<Category> Categories { get; set; }
+        public virtual ICollection<Category>? Categories { get; set; }
+        public virtual ICollection<Like>? Likes { get; set; }
     }
 }

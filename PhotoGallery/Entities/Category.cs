@@ -11,6 +11,6 @@ namespace PhotoGallery.Entities
         public string Username { get; set; }
 
         public virtual User User { get; set; }
-        public virtual ICollection<Photo> Photos { get; set; }
+        public ICollection<Photo>? Photos { get; set; }
     }
 }

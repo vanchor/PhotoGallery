@@ -12,8 +12,8 @@ namespace PhotoGallery.Entities
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
 
-        public virtual ICollection<Photo> Photos { get; set; }
-        public virtual ICollection<Like> Likes { get; set; }
-        public virtual ICollection<Category> Categories { get; set; }
+        public virtual ICollection<Photo>? Photos { get; set; }
+        public virtual ICollection<Like>? Likes { get; set; }
+        public virtual ICollection<Category>? Categories { get; set; }
     }
 }
