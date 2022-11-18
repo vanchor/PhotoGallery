@@ -25,7 +25,7 @@ namespace PhotoGallery.Pages
             };
             await localStorageService.SetAsync(nameof(SecurityToken), token);
 
-            navigationManager.NavigateTo("/");
+            navigationManager.NavigateTo("/", true);
         }
     }
 
