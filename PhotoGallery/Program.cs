@@ -6,6 +6,7 @@ using PhotoGallery.Data;
 using PhotoGallery.Infrastructure;
 using PhotoGallery.Repositories.Implementations;
 using PhotoGallery.Repositories.Interfaces;
+using PhotoGallery.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,8 @@ builder.Services.AddAuthorizationCore();
 
 builder.Services.AddScoped<AuthenticationStateProvider, TokenAuthenticationStateProvider>();
 builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
+
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 

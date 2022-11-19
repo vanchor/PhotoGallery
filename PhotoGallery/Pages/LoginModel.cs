@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components;
+using PhotoGallery.Models.UserDto;
 using PhotoGallery.Infrastructure;
 using System.ComponentModel.DataAnnotations;
+using PhotoGallery.Services;
+using System.Net;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace PhotoGallery.Pages
 {
@@ -8,40 +12,50 @@ namespace PhotoGallery.Pages
     {
         [Inject] public ILocalStorageService localStorageService { get; set; }
         [Inject] public NavigationManager navigationManager { get; set; }
+        [Inject] private IUserService _userService { get; set; }
+
         public LoginModel()
         {
             LoginData = new LoginViewModel();
+            UserModel = new UserModel();
         }
 
         public LoginViewModel LoginData { get; set; }
+        public string LoginError { get; set; }
 
         protected async Task LoginAsync()
         {
-            var token = new SecurityToken()
+            var response = _userService.Authenticate(LoginData);
+            if(response.StatusCode == HttpStatusCode.OK)
             {
-                Username = LoginData.Username,
-                AccessToken = LoginData.Password,
-                ExpiredAt = DateTime.UtcNow.AddMinutes(5)
-            };
-            await localStorageService.SetAsync(nameof(SecurityToken), token);
+                await localStorageService.SetAsync(nameof(SecurityToken), response.Data);
 
-            navigationManager.NavigateTo("/", true);
+                navigationManager.NavigateTo("/", true);
+            }
+            else
+            {
+                LoginError = response.Description; 
+                StateHasChanged();
+            }
         }
-    }
 
-    public class LoginViewModel
-    {
-        [Required]
-        public string Username { get; set; }
-        [Required]
-        public string Password { get; set; }
-    }
-    public class SecurityToken
-    {
-        public string Username { get; set; }
+        public UserModel UserModel { get; set; }
+        public string RegisterError { get; set; }
 
-        public string AccessToken { get; set; }
+        protected async Task RegisterAsync()
+        {
+            var response = await _userService.Register(UserModel);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                await localStorageService.SetAsync(nameof(SecurityToken), response.Data);
 
-        public DateTime ExpiredAt { get; set; }
+                navigationManager.NavigateTo("/", true);
+            }
+            else
+            {
+                RegisterError = response.Description;
+                StateHasChanged();
+            }
+        }
     }
 }
