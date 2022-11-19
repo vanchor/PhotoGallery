@@ -1,4 +1,9 @@
 ﻿@page "/"
+@using PhotoGallery.Helpers
+@using PhotoGallery.Services
+
+@inject IPhotoService PhotoService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>My images</PageTitle>
 
@@ -13,9 +18,8 @@
                         <img class="card-img-top" height="300" src="@previewImage" alt="New photo preview">
                         </label>
 
-
                     <div class="card-body">
-                        <h5 class="card-title">Card title</h5>
+                        <input type="text" @bind="PhotoTitle" @oninput="@((e) => { PhotoTitle=(string)e.Value;})" class="form-control" placeholder="Photo title..." />
                     </div>
                     <div class="card-footer">
                         <button class="btn btn-sm btn-success" type="button" @onclick="UploadFile">
@@ -38,17 +42,14 @@
     private string previewImage = "images/static/upload.png";
 
     private IBrowserFile selectedFile;
-
+    
+    private string? PhotoTitle { get; set; }
     private string labelText = "";
 
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
-        var file = e.GetMultipleFiles()[0];
-        var resizedImage = await file.RequestImageFileAsync(file.ContentType, 300, 300);
-        var buffer = new byte[resizedImage.Size];
-        await resizedImage.OpenReadStream().ReadAsync(buffer);
-
-        var imageUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
+        selectedFile = e.GetMultipleFiles()[0];
+        var imageUrl = await FileHelper.GeneratePhotoPreviewAsync(selectedFile, 300, 300);
         previewImage = imageUrl;
     }
 
@@ -58,7 +59,16 @@
         {
             if (selectedFile is not null)
             {
-                //await fileUpload.UpLoadFile(selectedFile);
+                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                var user = authState.User.Identity?.Name;
+                if (user == null)
+                    throw new ArgumentNullException("You must be authorized to upload the file");
+                await PhotoService.CreatePhoto(new Models.PhotoVM
+                {
+                    Title = PhotoTitle,
+                    file = selectedFile,
+                    Username = user,
+                });
             }
         }
         catch (Exception ex)
