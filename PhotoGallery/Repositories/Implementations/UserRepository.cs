@@ -9,5 +9,15 @@ namespace PhotoGallery.Repositories.Implementations
         public UserRepository(PhotoGalleryDbContext context) : base(context)
         {
         }
+
+        public User? GetById(string Username)
+        {
+            return _context.Users.Find(Username);
+        }
+
+        public async Task<User?> GetByIdAsync(string Username)
+        {
+            return await _context.Users.FindAsync(Username);
+        }
     }
 }

@@ -2,6 +2,7 @@
 using PhotoGallery.Pages;
 using PhotoGallery.Infrastructure;
 using System.Security.Claims;
+using PhotoGallery.Models.UserDto;
 
 internal class TokenAuthenticationStateProvider : AuthenticationStateProvider
 {
@@ -14,7 +15,6 @@ internal class TokenAuthenticationStateProvider : AuthenticationStateProvider
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-
         AuthenticationState CreateAnonymous()
         {
             var anonymousIdentity = new ClaimsIdentity();
@@ -34,8 +34,18 @@ internal class TokenAuthenticationStateProvider : AuthenticationStateProvider
             new Claim(ClaimTypes.Name, token.Username)
         };
 
-        var identity = new ClaimsIdentity(claims, "Token");
+        var identity = new ClaimsIdentity(claims, "Token"); 
         var anonymousPrincipal = new ClaimsPrincipal(identity);
         return new AuthenticationState(anonymousPrincipal);
+    }
+
+    public void MakeUserAnonymous()
+    {
+        _localStorageService.RemoveAsync(nameof(SecurityToken));
+
+        var anonymousIdentity = new ClaimsIdentity();
+        var anonymousPrincipal = new ClaimsPrincipal(anonymousIdentity);
+        var authState = Task.FromResult(new AuthenticationState(anonymousPrincipal));
+        NotifyAuthenticationStateChanged(authState);
     }
 }

@@ -5,22 +5,71 @@
 <div class="row">
 
     <div class="col-md-6 offset-md-3">
+        @if (isLoginModule)
+        {
+            <h1>Login</h1>
 
-        <h1>Enter zone</h1>
+            <EditForm Model="@LoginData" OnValidSubmit="LoginAsync">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
 
-        <EditForm Model="@LoginData" OnValidSubmit="LoginAsync">
-            <DataAnnotationsValidator/>
-            <ValidationSummary/>
+                @if (LoginError != null)
+                {
+                    <p class="validation-message">
+                        @LoginError
+                    </p>
+                }
 
-            <label for="username">UserName</label>
-            <InputText id="username" @bind-Value="LoginData.Username" class="form-control" />
-            <label for="password">Password</label>
-            <InputText id="password" @bind-Value="LoginData.Password" class="form-control" />
+                <label for="username">UserName</label>
+                <InputText id="username" @bind-Value="LoginData.Username" class="form-control" />
+                <label for="password">Password</label>
+                <InputText id="password" @bind-Value="LoginData.Password" class="form-control" />
 
-            <p class="my-4">
-                <button type="submit" class="btn btn-primary">Log in</button>
-            </p>
-        </EditForm>
+                <p class="my-4">
+                    <button type="submit" class="btn btn-primary">Log in</button>
+                </p>
+            </EditForm>
 
+            <p>No account? <button @onclick="ChangeMode" class="btn btn-outline-info">Register</button></p>
+        }
+        else
+        {
+            <h1>Register</h1>
+
+            <EditForm Model="@UserModel" OnValidSubmit="RegisterAsync">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                @if (RegisterError != null)
+                {
+                    <p class="validation-message">
+                        @RegisterError
+                    </p>
+                }
+
+                <label for="username">Username</label>
+                <InputText id="username" @bind-Value="UserModel.Username" class="form-control" />
+                <label for="email">Email</label>
+                <InputText id="email" @bind-Value="UserModel.Email" class="form-control" />
+                <label for="password">Password</label>
+                <InputText id="password" @bind-Value="UserModel.Password" class="form-control" />
+
+                <p class="my-4">
+                    <button type="submit" class="btn btn-primary">Register</button>
+                </p>
+            </EditForm>
+
+            
+            <p>Do you already have an account? <button @onclick="ChangeMode" class="btn btn-outline-info">Login</button></p>
+        }
     </div>
 </div>
+
+@code {
+    public bool isLoginModule { get; set; } = true;
+
+    void ChangeMode()
+    {
+        isLoginModule = !isLoginModule;
+    }
+}
