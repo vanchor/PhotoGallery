@@ -7,7 +7,7 @@ namespace PhotoGallery.Services
     public interface IUserService
     {
         Task<BaseResponse<SecurityToken>> Register(UserModel userModel);
-        BaseResponse<SecurityToken> Authenticate(LoginViewModel model);
+        Task<BaseResponse<SecurityToken>> Authenticate(LoginViewModel model);
 
         User GetById(string id);
     }

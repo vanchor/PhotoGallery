@@ -15,9 +15,9 @@ namespace PhotoGallery.Services
             _userRepository = userRepository;
         }
 
-        public BaseResponse<SecurityToken> Authenticate(LoginViewModel model)
+        public async Task<BaseResponse<SecurityToken>> Authenticate(LoginViewModel model)
         {
-            var userInDb = _userRepository.GetById(model.Username);
+            var userInDb = await _userRepository.GetByIdAsync(model.Username);
 
             if (userInDb == null ||
                 !HashPasswordHelper.VerifyPasswordHash(model.Password, userInDb.PasswordHash, userInDb.PasswordSalt))
@@ -68,7 +68,7 @@ namespace PhotoGallery.Services
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();
 
-            var response = Authenticate(new LoginViewModel
+            var response = await Authenticate(new LoginViewModel
             {
                 Username = userModel.Username,
                 Password = userModel.Password

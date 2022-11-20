@@ -25,7 +25,7 @@ namespace PhotoGallery.Pages
 
         protected async Task LoginAsync()
         {
-            var response = _userService.Authenticate(LoginData);
+            var response = await _userService.Authenticate(LoginData);
             if(response.StatusCode == HttpStatusCode.OK)
             {
                 await localStorageService.SetAsync(nameof(SecurityToken), response.Data);

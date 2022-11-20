@@ -14,5 +14,10 @@ namespace PhotoGallery.Repositories.Implementations
         {
             return _context.Users.Find(Username);
         }
+
+        public async Task<User?> GetByIdAsync(string Username)
+        {
+            return await _context.Users.FindAsync(Username);
+        }
     }
 }
