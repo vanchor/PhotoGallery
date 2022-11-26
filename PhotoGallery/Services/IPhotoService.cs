@@ -1,4 +1,5 @@
-﻿using PhotoGallery.Models;
+﻿using PhotoGallery.Entities;
+using PhotoGallery.Models;
 
 namespace PhotoGallery.Services
 {
@@ -6,5 +7,6 @@ namespace PhotoGallery.Services
     {
         Task CreatePhoto(PhotoVM photoVM);
 
+        BaseResponse<IEnumerable<Photo>> GetAll();
     }
 }

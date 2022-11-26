@@ -29,11 +29,6 @@ namespace PhotoGallery.Helpers
                 throw new ArgumentNullException(nameof(file));
         }
 
-        public static void ResizeImage(IFormFile file, string imagePath, int newWidth, int newHeight = 0)
-        {
-            
-        }
-
         public static async Task<string> GeneratePhotoPreviewAsync(IBrowserFile file, int width = 100, int height = 100)
         {
             var resizedImage = await file.RequestImageFileAsync(file.ContentType, width, height);

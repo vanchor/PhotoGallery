@@ -32,7 +32,15 @@ namespace PhotoGallery.Services
             await FileHelper.UploadFileAsync(photoVM.file, Path.Combine(fullPathToUserFolderInMedia, photoName));
 
             _photoRepository.Add(photo);
-            _photoRepository.SaveChanges();
+            await _photoRepository.SaveChangesAsync();
+        }
+
+        public BaseResponse<IEnumerable<Photo>> GetAll()
+        {
+            return new BaseResponse<IEnumerable<Photo>>() {
+              Data = _photoRepository.GetAll().OrderByDescending(g => g.Date),
+              StatusCode = System.Net.HttpStatusCode.OK
+            };
         }
     }
 }
