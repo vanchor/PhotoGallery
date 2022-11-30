@@ -23,7 +23,7 @@ namespace PhotoGallery.Helpers
             if (file is not null)
             {
                 await using FileStream fs = new(imagePath, FileMode.Create);
-                await file.OpenReadStream(maxAllowedSize: 1000000).CopyToAsync(fs);
+                await file.OpenReadStream(maxAllowedSize: 5000000).CopyToAsync(fs);
             }
             else
                 throw new ArgumentNullException(nameof(file));
@@ -43,7 +43,7 @@ namespace PhotoGallery.Helpers
                 throw new ArgumentException("The file is not an image!");
 
             await using MemoryStream ms = new MemoryStream();
-            await file.OpenReadStream(maxAllowedSize: 1000000).CopyToAsync(ms);
+            await file.OpenReadStream(maxAllowedSize: 5000000).CopyToAsync(ms);
 
             Image image = Image.FromStream(ms, true, true);
             if (newHeight == 0 && newWidth > 0)
