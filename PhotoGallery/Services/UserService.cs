@@ -32,7 +32,7 @@ namespace PhotoGallery.Services
             {
                 Username = model.Username,
                 AccessToken = model.Password,
-                ExpiredAt = DateTime.UtcNow.AddMinutes(5)
+                ExpiredAt = DateTime.UtcNow.AddDays(5)
             };
 
             return new BaseResponse<SecurityToken>() {
