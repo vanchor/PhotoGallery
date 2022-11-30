@@ -36,5 +36,31 @@ namespace PhotoGallery.Helpers
             await resizedImage.OpenReadStream().ReadAsync(buffer);
             return $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
         }
+
+        public static async Task ResizeImageAsync(IBrowserFile file, string imagePath, int newWidth = 0, int newHeight = 0)
+        {
+            if (!file.ContentType.Contains("image"))
+                throw new ArgumentException("The file is not an image!");
+
+            await using MemoryStream ms = new MemoryStream();
+            await file.OpenReadStream(maxAllowedSize: 1000000).CopyToAsync(ms);
+
+            Image image = Image.FromStream(ms, true, true);
+            if (newHeight == 0 && newWidth > 0)
+            {
+                var multiplier = (float)newWidth / image.Width;
+                newHeight = (int)(multiplier * image.Height);
+            }
+            else if (newWidth == 0 && newHeight > 0)
+            {
+                var multiplier = (float)newHeight / image.Height;
+                newWidth = (int)(multiplier * image.Width);
+            }
+            else
+                throw new ArgumentException("The height and width cannot be less than 0. At least one of the parameters must be greater than 0.");
+
+            Bitmap resized = new Bitmap(image, newWidth, newHeight);
+            resized.Save(imagePath);
+        }
     }
 }

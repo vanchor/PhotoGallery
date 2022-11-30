@@ -31,6 +31,9 @@ namespace PhotoGallery.Services
 
             await FileHelper.UploadFileAsync(photoVM.file, Path.Combine(fullPathToUserFolderInMedia, photoName));
 
+            FileHelper.CreateDirectory(Path.Combine(fullPathToUserFolderInMedia, "preview"));
+            await FileHelper.ResizeImageAsync(photoVM.file, Path.Combine(fullPathToUserFolderInMedia, "preview", photoName), newHeight: 300);
+
             _photoRepository.Add(photo);
             await _photoRepository.SaveChangesAsync();
         }
