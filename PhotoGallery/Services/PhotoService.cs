@@ -41,7 +41,7 @@ namespace PhotoGallery.Services
             if (Username == null)
                 photos = _photoRepository.GetAll();
             else
-                photos = _photoRepository.GetAllByUser(Username);
+                photos = _photoRepository.GetAllByUserWithPagination(Username, 10, 0);
 
             return new BaseResponse<IEnumerable<Photo>>() {
               Data = photos.OrderByDescending(g => g.Date),

@@ -10,9 +10,9 @@ namespace PhotoGallery.Repositories.Implementations
         {
         }
 
-        public IEnumerable<Photo> GetAllByUser(string username)
+        public IEnumerable<Photo> GetAllByUserWithPagination(string username, int count = 0, int page = 0)
         {
-            return _context.Photos.Where(p => p.Username == username).ToList();
+            return _context.Photos.Where(p => p.Username == username).OrderByDescending(p => p.Date).Skip(page * count).Take(count).ToList();
         }
     }
 }
