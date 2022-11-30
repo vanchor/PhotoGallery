@@ -1,12 +1,116 @@
 ﻿@page "/"
+@using PhotoGallery.Entities
+@using PhotoGallery.Helpers
+@using PhotoGallery.Services
 
-<PageTitle>Index</PageTitle>
+@inject NavigationManager navigationManager;
+@inject AuthenticationStateProvider _authenticationStateProvider;
+@inject IPhotoService _photoService;
 
 <AuthorizeView>
     <Authorized>
-        Auth @context.User.Identity.Name 
+        <PageTitle>@context.User.Identity.Name images</PageTitle>
+
+        <div class="row gx-4 gx-lg-4">
+            <div class="col-12 col-md-6 col-xl-4 mb-5">
+                    <div class="card h-100">
+                        <InputFile OnChange="OnInputFileChange" hidden accept="image/png, image/jpeg" id="fileInput" />
+                        <label for="fileInput" style="cursor: pointer; border-bottom: 1px solid rgba(0, 0, 0, .2);">
+                            @if(selectedFile == null){
+                                <div class="card-img-top" style="height: 300px; display: flex; align-items: center;">
+                                    <img style="margin: 0 auto;" src="@previewImage" alt="New photo preview">
+                                </div>
+                            }
+                            else
+                            {
+                                <img style="object-fit: cover; height: 300px" class="card-img-top" src="@previewImage" alt="New photo preview">
+                            }
+                        </label>
+
+                        <div class="card-body">
+                            <h3><input type="text" @bind="PhotoTitle" @oninput="@((e) => { PhotoTitle=(string)e.Value;})" class="form-control" placeholder="Photo title..." /></h3>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-sm btn-success" type="button" @onclick="UploadFile">
+                                Upload
+                            </button>
+                        </div>
+
+                </div>
+                <br />
+                <label>@labelText</label>
+            </div>
+
+             @if (photos != null)
+                @foreach (var photo in photos)
+                {
+                    var photoUrl = PathToMediaFolder + "/" + photo.Username + "/" + photo.FileName;
+                    <div class="col-12 col-md-6 col-xl-4 mb-5">
+                        <div class="card h-100">
+                            <a href="@photoUrl">
+                                <img style="object-fit: cover; height: 300px" class="card-img-top" src="@photoUrl" alt="New photo preview">
+                            </a>
+                            <div class="card-body">
+                                <h3>@photo.Title</h3>
+                            </div>
+                            <div class="card-footer">
+                                <p>@photo.Date</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+        </div>
     </Authorized>
     <NotAuthorized>
-        NotAuth
+        <PageTitle>All images</PageTitle>
+        <h2>You must be authorized</h2>
     </NotAuthorized>
 </AuthorizeView>
+
+@code {
+
+    public IEnumerable<Photo>? photos { get; set; } = null;
+
+    private string previewImage = "images/static/upload.png";
+    private string PathToMediaFolder = "images/media/";
+
+    private IBrowserFile selectedFile;
+
+    private string? PhotoTitle { get; set; }
+    private string labelText = "";
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User.Identity?.Name;
+        photos = _photoService.GetAll(user).Data;
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.GetMultipleFiles()[0];
+        var imageUrl = await FileHelper.GeneratePhotoPreviewAsync(selectedFile, 400, 400);
+        previewImage = imageUrl;
+    }
+
+    private async Task UploadFile()
+    {
+
+        if (selectedFile is not null)
+        {
+            var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User.Identity?.Name;
+            if (user == null)
+                throw new ArgumentNullException("You must be authorized to upload the file");
+            await _photoService.CreatePhoto(new Models.PhotoVM
+                {
+                    Title = PhotoTitle,
+                    file = selectedFile,
+                    Username = user,
+                });
+
+            navigationManager.NavigateTo(navigationManager.Uri, true);
+        }
+    }
+}

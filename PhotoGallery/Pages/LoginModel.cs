@@ -29,7 +29,6 @@ namespace PhotoGallery.Pages
             if(response.StatusCode == HttpStatusCode.OK)
             {
                 await localStorageService.SetAsync(nameof(SecurityToken), response.Data);
-
                 navigationManager.NavigateTo("/", true);
             }
             else
