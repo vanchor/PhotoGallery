@@ -4,9 +4,8 @@
 @using PhotoGallery.Services
 
 @inject NavigationManager navigationManager;
-@inherits IndexModel
-
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AuthenticationStateProvider _authenticationStateProvider;
+@inject IPhotoService _photoService;
 
 <AuthorizeView>
     <Authorized>
@@ -14,10 +13,9 @@
 
         <div class="row gx-4 gx-lg-4">
             <div class="col-12 col-md-6 col-xl-4 mb-5">
-                <div class="form-group">
                     <div class="card h-100">
                         <InputFile OnChange="OnInputFileChange" hidden accept="image/png, image/jpeg" id="fileInput" />
-                        <label for="fileInput" style="cursor: pointer">
+                        <label for="fileInput" style="cursor: pointer; border-bottom: 1px solid rgba(0, 0, 0, .2);">
                             @if(selectedFile == null){
                                 <div class="card-img-top" style="height: 300px; display: flex; align-items: center;">
                                     <img style="margin: 0 auto;" src="@previewImage" alt="New photo preview">
@@ -30,14 +28,14 @@
                         </label>
 
                         <div class="card-body">
-                            <input type="text" @bind="PhotoTitle" @oninput="@((e) => { PhotoTitle=(string)e.Value;})" class="form-control" placeholder="Photo title..." />
+                            <h3><input type="text" @bind="PhotoTitle" @oninput="@((e) => { PhotoTitle=(string)e.Value;})" class="form-control" placeholder="Photo title..." /></h3>
                         </div>
                         <div class="card-footer">
                             <button class="btn btn-sm btn-success" type="button" @onclick="UploadFile">
                                 Upload
                             </button>
                         </div>
-                    </div>
+
                 </div>
                 <br />
                 <label>@labelText</label>
@@ -46,10 +44,12 @@
              @if (photos != null)
                 @foreach (var photo in photos)
                 {
+                    var photoUrl = PathToMediaFolder + "/" + photo.Username + "/" + photo.FileName;
                     <div class="col-12 col-md-6 col-xl-4 mb-5">
                         <div class="card h-100">
-                            <img style="object-fit: cover; height: 300px" class="card-img-top" src="@(PathToMediaFolder +"/"+ photo.Username+"/"+photo.FileName)" alt="New photo preview">
-
+                            <a href="@photoUrl">
+                                <img style="object-fit: cover; height: 300px" class="card-img-top" src="@photoUrl" alt="New photo preview">
+                            </a>
                             <div class="card-body">
                                 <h3>@photo.Title</h3>
                             </div>
@@ -68,6 +68,9 @@
 </AuthorizeView>
 
 @code {
+
+    public IEnumerable<Photo>? photos { get; set; } = null;
+
     private string previewImage = "images/static/upload.png";
     private string PathToMediaFolder = "images/media/";
 
@@ -75,6 +78,14 @@
 
     private string? PhotoTitle { get; set; }
     private string labelText = "";
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User.Identity?.Name;
+        photos = _photoService.GetAll(user).Data;
+    }
 
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
@@ -88,7 +99,7 @@
 
         if (selectedFile is not null)
         {
-            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
             var user = authState.User.Identity?.Name;
             if (user == null)
                 throw new ArgumentNullException("You must be authorized to upload the file");

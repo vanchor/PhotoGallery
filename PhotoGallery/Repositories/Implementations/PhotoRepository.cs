@@ -9,5 +9,10 @@ namespace PhotoGallery.Repositories.Implementations
         public PhotoRepository(PhotoGalleryDbContext context) : base(context)
         {
         }
+
+        public IEnumerable<Photo> GetAllByUser(string username)
+        {
+            return _context.Photos.Where(p => p.Username == username).ToList();
+        }
     }
 }

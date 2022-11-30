@@ -35,10 +35,16 @@ namespace PhotoGallery.Services
             await _photoRepository.SaveChangesAsync();
         }
 
-        public BaseResponse<IEnumerable<Photo>> GetAll()
+        public BaseResponse<IEnumerable<Photo>> GetAll(string? Username)
         {
+            IEnumerable<Photo> photos;
+            if (Username == null)
+                photos = _photoRepository.GetAll();
+            else
+                photos = _photoRepository.GetAllByUser(Username);
+
             return new BaseResponse<IEnumerable<Photo>>() {
-              Data = _photoRepository.GetAll().OrderByDescending(g => g.Date),
+              Data = photos.OrderByDescending(g => g.Date),
               StatusCode = System.Net.HttpStatusCode.OK
             };
         }
