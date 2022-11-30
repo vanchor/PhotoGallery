@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PhotoGallery.Entities;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace PhotoGallery.Data
 {
@@ -13,6 +15,19 @@ namespace PhotoGallery.Data
 
         public PhotoGalleryDbContext(DbContextOptions<PhotoGalleryDbContext> options) : base(options)
         {
+            try
+            {
+                var dbCreator = Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
+                if (dbCreator != null)
+                {
+                    if (!dbCreator.CanConnect()) dbCreator.Create();
+                    if (!dbCreator.HasTables()) dbCreator.CreateTables();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -46,6 +61,8 @@ namespace PhotoGallery.Data
                     .OnDelete(DeleteBehavior.NoAction)
                     .IsRequired();
             });
+
+            base.OnModelCreating(builder);
         }
     }
 }
