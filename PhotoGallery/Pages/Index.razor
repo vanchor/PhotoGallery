@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/{page:int?}"
 @using PhotoGallery.Entities
 @using PhotoGallery.Helpers
 @using PhotoGallery.Services
@@ -12,11 +12,15 @@
         <PageTitle>@context.User.Identity.Name images</PageTitle>
 
         <div class="row gx-4 gx-lg-4">
-            <div class="col-12 col-md-6 col-xl-4 mb-5">
+            @if (page == 0)
+            {
+                <div class="col-12 col-md-6 col-xl-4 mb-5">
+
                     <div class="card h-100">
                         <InputFile OnChange="OnInputFileChange" hidden accept="image/png, image/jpeg" id="fileInput" />
                         <label for="fileInput" style="cursor: pointer; border-bottom: 1px solid rgba(0, 0, 0, .2);">
-                            @if(selectedFile == null){
+                            @if (selectedFile == null)
+                            {
                                 <div class="card-img-top" style="height: 300px; display: flex; align-items: center;">
                                     <img style="margin: 0 auto;" src="@previewImage" alt="New photo preview">
                                 </div>
@@ -35,13 +39,13 @@
                                 Upload
                             </button>
                         </div>
-
+                    </div>
+                    <br />
+                    <label>@labelText</label>
                 </div>
-                <br />
-                <label>@labelText</label>
-            </div>
+            }
 
-             @if (photos != null)
+            @if (photos != null)
                 @foreach (var photo in photos)
                 {
                     var photoUrl = PathToMediaFolder + "/" + photo.Username + "/" + photo.FileName;
@@ -59,6 +63,25 @@
                         </div>
                     </div>
                 }
+
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    @for (int i = 0; i < numberOfPages; i++)
+                    {
+                        if (i != page)
+                        {
+                            <li class="page-item"><a class="page-link" href="/@i">@i</a></li>
+                        }
+                        else
+                        {
+                            
+                        <li class="page-item active" aria-current="page">
+                            <span class="page-link">@i</span>
+                        </li>
+                        }
+                    }
+                </ul>
+            </nav>
         </div>
     </Authorized>
     <NotAuthorized>
@@ -68,8 +91,23 @@
 </AuthorizeView>
 
 @code {
+    private int _page;
+    [Parameter]
+    public int? page
+    {
+        get => _page;
+        set
+        {   
+            if (value == null)
+                _page = 0;
+            else
+                _page = (int)value;
+            loadImages();
+        }
+    }
 
     public IEnumerable<Photo>? photos { get; set; } = null;
+    private int numberOfPages;
 
     private string previewImage = "images/static/upload.png";
     private string PathToMediaFolder = "images/media/";
@@ -78,19 +116,26 @@
 
     private string? PhotoTitle { get; set; }
     private string labelText = "";
+    private string currentUsername;
 
 
     protected async override Task OnInitializedAsync()
     {
         var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User.Identity?.Name;
-        photos = _photoService.GetAll(user).Data;
+        currentUsername = authState.User.Identity?.Name;
+    }
+
+    private void loadImages()
+    {
+        var response = _photoService.GetAll(currentUsername, page: _page);
+        photos = response.Data.Photos;
+        numberOfPages = response.Data.NumberOfPages;
     }
 
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
         selectedFile = e.GetMultipleFiles()[0];
-        var imageUrl = await FileHelper.GeneratePhotoPreviewAsync(selectedFile, 400, 400);
+        var imageUrl = await FileHelper.GeneratePhotoPreviewAsync(selectedFile, 500, 300);
         previewImage = imageUrl;
     }
 

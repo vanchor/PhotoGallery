@@ -35,7 +35,7 @@ namespace PhotoGallery.Services
             await _photoRepository.SaveChangesAsync();
         }
 
-        public BaseResponse<IEnumerable<Photo>> GetAll(string? Username)
+        public BaseResponse<PhotosPaginationVM> GetAll(string? Username, int postsPerPage = 5, int page = 0)
         {
             IEnumerable<Photo> photos;
             if (Username == null)
@@ -43,8 +43,17 @@ namespace PhotoGallery.Services
             else
                 photos = _photoRepository.GetAllByUser(Username);
 
-            return new BaseResponse<IEnumerable<Photo>>() {
-              Data = photos.OrderByDescending(g => g.Date),
+            int numberOfPage = (int)Math.Ceiling((decimal)(1.0 * photos.Count() / postsPerPage * 1.0));
+            photos = photos.OrderByDescending(g => g.Date).Skip(page * postsPerPage).Take(postsPerPage);
+            var result = new PhotosPaginationVM()
+            {
+                Photos = photos,
+                PageNumber = page,
+                NumberOfPages = numberOfPage
+            };
+
+            return new BaseResponse<PhotosPaginationVM>() {
+              Data = result,
               StatusCode = System.Net.HttpStatusCode.OK
             };
         }
