@@ -75,10 +75,10 @@
                         }
                         else
                         {
-                            
-                        <li class="page-item active" aria-current="page">
-                            <span class="page-link">@i</span>
-                        </li>
+
+                            <li class="page-item active" aria-current="page">
+                                <span class="page-link">@i</span>
+                            </li>
                         }
                     }
                 </ul>
@@ -98,32 +98,39 @@
     {
         get => _page;
         set
-        {   
+        {
             if (value == null)
                 _page = 0;
             else
                 _page = (int)value;
-            loadImages();
+            if(currentUsername != null)
+                loadImages();
         }
     }
-
+    private string? currentUsername = null;
     public IEnumerable<Photo>? photos { get; set; } = null;
     private int numberOfPages;
 
     private string previewImage = "images/static/upload.png";
-    private string PathToMediaFolder = "images/media/";
-
-    private IBrowserFile selectedFile;
+    private string PathToMediaFolder = "images/media/"; 
+    private IBrowserFile? selectedFile;
 
     private string? PhotoTitle { get; set; }
     private string labelText = "";
-    private string currentUsername;
-
 
     protected async override Task OnInitializedAsync()
     {
         var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
         currentUsername = authState.User.Identity?.Name;
+        loadImages();
+    }
+
+    private void resetForm()
+    {
+        labelText = "";
+        PhotoTitle = "";
+        previewImage = "images/static/upload.png";
+        selectedFile = null;
     }
 
     private void loadImages()
@@ -156,7 +163,8 @@
                     Username = user,
                 });
 
-            navigationManager.NavigateTo(navigationManager.Uri, true);
+            resetForm();
+            loadImages();
         }
     }
 }
