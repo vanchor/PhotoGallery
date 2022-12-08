@@ -6,6 +6,7 @@ namespace PhotoGallery.Models.UserDto
     {
         [Required]
         [RegularExpression(@"^[a-zA-Z0-9]+$", ErrorMessage = "Username cannot have special character or spaces")]
+        [MaxLength(10)]
         public string Username { get; set; }
         [Required]
         [EmailAddress]
