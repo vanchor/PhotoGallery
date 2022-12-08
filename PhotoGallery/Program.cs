@@ -14,9 +14,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
+//builder.Services.AddDbContext<PhotoGalleryDbContext>(
+//    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
+//    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.")));
+
 builder.Services.AddDbContext<PhotoGalleryDbContext>(
-    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.")));
+    options => options.UseInMemoryDatabase("PhotoGalleryDb"));
 
 builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();
@@ -40,7 +43,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
